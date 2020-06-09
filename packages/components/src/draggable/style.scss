@@ -17,9 +17,8 @@ body.is-dragging-components-draggable {
 	pointer-events: none;
 	z-index: z-index(".components-draggable__clone");
 
+	// Hide the actual clone. If this experiment is successful, we'll want to actually remove the clone entirely.
 	> * {
-		// This needs specificity as a theme is meant to define these by default.
-		margin-top: 0 !important;
-		margin-bottom: 0 !important;
+		display: none;
 	}
 }
