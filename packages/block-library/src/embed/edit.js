@@ -114,7 +114,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			setURL( newURL );
 			setIsEditingURL( false );
 			setAttributes( { url: newURL } );
-		}, [ cannotEmbed, fetching, attributes ] );
+		}, [ attributes.allowResponsive, attributes.className, cannotEmbed, fetching, preview.html ] );
 
 		useEffect( () => {
 			if ( preview && ! isEditingURL ) {
