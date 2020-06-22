@@ -66,7 +66,6 @@ class Draggable extends Component {
 	/**
 	 * This method does a couple of things:
 	 *
-	 * - Clones the current element and spawns clone over original element.
 	 * - Adds a fake temporary drag image to avoid browser defaults.
 	 * - Sets transfer data.
 	 * - Adds dragover listener.
@@ -107,8 +106,6 @@ class Draggable extends Component {
 		const elementWrapper = element.parentNode;
 		const elementTopOffset = parseInt( elementRect.top, 10 );
 		const elementLeftOffset = parseInt( elementRect.left, 10 );
-		const clone = element.cloneNode( true );
-		clone.id = `clone-${ elementId }`;
 		this.cloneWrapper = document.createElement( 'div' );
 		this.cloneWrapper.classList.add( cloneWrapperClass );
 		if ( cloneClassname ) {
@@ -135,12 +132,6 @@ class Draggable extends Component {
 			}px`;
 		}
 
-		// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
-		Array.from( clone.querySelectorAll( 'iframe' ) ).forEach( ( child ) =>
-			child.parentNode.removeChild( child )
-		);
-
-		this.cloneWrapper.appendChild( clone );
 		elementWrapper.appendChild( this.cloneWrapper );
 
 		// Mark the current cursor coordinates.
