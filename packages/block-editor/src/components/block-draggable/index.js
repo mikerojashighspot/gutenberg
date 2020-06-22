@@ -5,6 +5,11 @@ import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import BlockDraggableChip from './draggable-chip';
+
 const BlockDraggable = ( { children, clientIds, cloneClassname } ) => {
 	const { srcRootClientId, index, isDraggable } = useSelect(
 		( select ) => {
@@ -68,6 +73,9 @@ const BlockDraggable = ( { children, clientIds, cloneClassname } ) => {
 				stopDraggingBlocks();
 				isDragging.current = false;
 			} }
+			__experimentalDragComponent={
+				<BlockDraggableChip clientIds={ clientIds } />
+			}
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {
