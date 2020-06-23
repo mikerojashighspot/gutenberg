@@ -95,6 +95,14 @@ function NavigationLinkEdit( {
 	const setIsLinkOpen = ( value ) => {
 		setEditUrl( displayUrl );
 		_setIsLinkOpen( value );
+		// @TODO: This function is stealing focus from the popover.
+		//        Let's make sure the popover isn't getting focused in the first place
+		setTimeout( () => {
+			console.log( inputRef.current );
+			if ( inputRef.current ) {
+				inputRef.current.focus();
+			}
+		}, 100 );
 	};
 
 	const handleFinishEditing = useCallback( () => {
@@ -127,7 +135,7 @@ function NavigationLinkEdit( {
 					{ isLinkOpen ? (
 						<ToolbarItem ref={ inputRef }>
 							{ ( toolbarItemProps ) => (
-								<>
+								<div>
 									<input
 										type="text"
 										placeholder={ 'Link address' }
@@ -161,6 +169,8 @@ function NavigationLinkEdit( {
 													? handleCreatePage
 													: undefined
 											}
+											inputValue={ editUrl }
+											onlySuggestions
 											onChange={ ( {
 												title: newTitle = '',
 												url: newURL = '',
@@ -199,7 +209,7 @@ function NavigationLinkEdit( {
 											} }
 										/>
 									</Popover>
-								</>
+								</div>
 							) }
 						</ToolbarItem>
 					) : (

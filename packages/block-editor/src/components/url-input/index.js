@@ -57,7 +57,10 @@ class URLInput extends Component {
 
 	componentDidUpdate( prevProps ) {
 		const { showSuggestions, selectedSuggestion } = this.state;
-		const { value } = this.props;
+		const {
+			value,
+			__experimentalOnlySuggestions: onlySuggestions,
+		} = this.props;
 
 		// only have to worry about scrolling selected suggestion into view
 		// when already expanded
@@ -384,6 +387,7 @@ class URLInput extends Component {
 			value = '',
 			autoFocus = true,
 			__experimentalShowInitialSuggestions = false,
+			__experimentalOnlySuggestions: onlySuggestions = false,
 		} = this.props;
 
 		const {
@@ -423,29 +427,31 @@ class URLInput extends Component {
 					'is-full-width': isFullWidth,
 				} ) }
 			>
-				<input
-					className="block-editor-url-input__input"
-					autoFocus={ autoFocus }
-					type="text"
-					aria-label={ __( 'URL' ) }
-					required
-					value={ value }
-					onChange={ this.onChange }
-					onFocus={ this.onFocus }
-					onInput={ stopEventPropagation }
-					placeholder={ placeholder }
-					onKeyDown={ this.onKeyDown }
-					role="combobox"
-					aria-expanded={ showSuggestions }
-					aria-autocomplete="list"
-					aria-owns={ suggestionsListboxId }
-					aria-activedescendant={
-						selectedSuggestion !== null
-							? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
-							: undefined
-					}
-					ref={ this.inputRef }
-				/>
+				{ ! onlySuggestions && (
+					<input
+						className="block-editor-url-input__input"
+						autoFocus={ autoFocus }
+						type="text"
+						aria-label={ __( 'URL' ) }
+						required
+						value={ value }
+						onChange={ this.onChange }
+						onFocus={ this.onFocus }
+						onInput={ stopEventPropagation }
+						placeholder={ placeholder }
+						onKeyDown={ this.onKeyDown }
+						role="combobox"
+						aria-expanded={ showSuggestions }
+						aria-autocomplete="list"
+						aria-owns={ suggestionsListboxId }
+						aria-activedescendant={
+							selectedSuggestion !== null
+								? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
+								: undefined
+						}
+						ref={ this.inputRef }
+					/>
+				) }
 
 				{ loading && <Spinner /> }
 
