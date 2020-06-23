@@ -9,15 +9,20 @@ import { get, head, find } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
+import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
 import {
 	ExternalLink,
 	PanelBody,
+	Popover,
 	TextareaControl,
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
+	__experimentalToolbarItem as ToolbarItem,
+	KeyboardShortcuts,
 } from '@wordpress/components';
+import { link as linkIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
@@ -25,14 +30,21 @@ import {
 	InspectorControls,
 	RichText,
 	__experimentalBlock as Block,
+	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
-import { Fragment, useCallback, useEffect, useRef } from '@wordpress/element';
+import {
+	Fragment,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
-import ToolbarUrlButton from './toolbar-url-button';
+import useDisplayUrl from './use-display-url';
 
 function NavigationLinkEdit( {
 	attributes,
@@ -58,15 +70,162 @@ function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
+	const displayUrl = useDisplayUrl( url );
+	const [ editUrl, setEditUrl ] = useState( displayUrl );
+	const [ isLinkOpen, _setIsLinkOpen ] = useState( false );
+	// const link = {
+	// 	url,
+	// 	opensInNewTab,
+	// };
+	// Show the LinkControl on mount if the URL is empty
+	// ( When adding a new menu item)
+	// This can't be done in the useState call because it cconflicts
+	// with the autofocus behavior of the BlockListBlock component.
+	useEffect( () => {
+		if ( ! url ) {
+			// setIsLinkOpen( true );
+		}
+	}, [] );
+
+	useEffect( () => {
+		console.log( 'isLinkOpen', isLinkOpen );
+	}, [ isLinkOpen ] );
+
+	const inputRef = useRef();
+	const setIsLinkOpen = ( value ) => {
+		setEditUrl( displayUrl );
+		_setIsLinkOpen( value );
+	};
+
+	const handleFinishEditing = useCallback( () => {
+		setAttributes( { url: editUrl } );
+		setIsLinkOpen( false );
+		if ( inputRef.current ) {
+			inputRef.current.blur();
+		}
+	}, [ editUrl ] );
+
+	async function handleCreatePage( pageTitle ) {
+		const type = 'page';
+		const page = await saveEntityRecord( 'postType', type, {
+			title: pageTitle,
+			status: 'publish',
+		} );
+
+		return {
+			id: page.id,
+			type,
+			title: page.title.rendered,
+			url: page.link,
+		};
+	}
+
 	return (
 		<Fragment>
 			<BlockControls key="1">
-				<ToolbarUrlButton
-					key="toolbar-url"
-					url={ url }
-					onChange={ ( newUrl ) => setAttributes( { url: newUrl } ) }
-				/>
-				<ToolbarGroup eventToOffset={ () => undefined }></ToolbarGroup>
+				<ToolbarGroup eventToOffset={ () => undefined }>
+					{ isLinkOpen ? (
+						<ToolbarItem ref={ inputRef }>
+							{ ( toolbarItemProps ) => (
+								<>
+									<input
+										type="text"
+										placeholder={ 'Link address' }
+										className="navigation-link-edit-link-rich-text"
+										value={ editUrl }
+										{ ...toolbarItemProps }
+										onChange={ ( e ) => {
+											setEditUrl( e.currentTarget.value );
+										} }
+										onBlur={ () => {
+											// handleFinishEditing();
+										} }
+										onKeyDown={ ( e ) => {
+											if ( e.which === 13 ) {
+												handleFinishEditing();
+											}
+										} }
+										onKeyUp={ ( e ) => {
+											if ( e.which === 13 ) {
+												handleFinishEditing();
+											}
+										} }
+									/>
+									<Popover position="bottom center">
+										<LinkControl
+											className="wp-block-navigation-link__inline-link-input"
+											value={ editUrl }
+											showInitialSuggestions={ true }
+											createSuggestion={
+												userCanCreatePages
+													? handleCreatePage
+													: undefined
+											}
+											onChange={ ( {
+												title: newTitle = '',
+												url: newURL = '',
+												opensInNewTab: newOpensInNewTab,
+												id,
+											} = {} ) => {
+												console.log( 'ON CHANGE' );
+												setIsLinkOpen( false );
+												setAttributes( {
+													url: encodeURI( newURL ),
+													label: ( () => {
+														const normalizedTitle = newTitle.replace(
+															/http(s?):\/\//gi,
+															''
+														);
+														const normalizedURL = newURL.replace(
+															/http(s?):\/\//gi,
+															''
+														);
+														if (
+															newTitle !== '' &&
+															normalizedTitle !==
+																normalizedURL &&
+															label !== newTitle
+														) {
+															return newTitle;
+														} else if ( label ) {
+															return label;
+														}
+														// If there's no label, add the URL.
+														return normalizedURL;
+													} )(),
+													opensInNewTab: newOpensInNewTab,
+													id,
+												} );
+											} }
+										/>
+									</Popover>
+								</>
+							) }
+						</ToolbarItem>
+					) : (
+						<>
+							<KeyboardShortcuts
+								bindGlobal
+								shortcuts={ {
+									[ rawShortcut.primary( 'k' ) ]: () =>
+										setIsLinkOpen( true ),
+								} }
+							/>
+							<ToolbarButton
+								name="link"
+								icon={ displayUrl ? null : linkIcon }
+								title={ __( 'Link' ) }
+								shortcut={ displayShortcut.primary( 'k' ) }
+								onClick={ () => setIsLinkOpen( true ) }
+								className="navigation-link-edit-link-button"
+							>
+								<span className="navigation-link-edit-link-label">
+									{ displayUrl }
+								</span>
+							</ToolbarButton>
+						</>
+					) }
+				</ToolbarGroup>
 				<ToolbarGroup>
 					<ToolbarButton
 						name="submenu"
