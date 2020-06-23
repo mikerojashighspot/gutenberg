@@ -14,12 +14,21 @@
 		margin-right: 0;
 	}
 
-	.navigation-link-edit-link-label {
+	.navigation-link-edit-link-label,
+	.navigation-link-edit-link-rich-text {
 		display: inline-block;
+		white-space: nowrap !important;
+		transition: max-width 0.3s ease-in;
+	}
+
+	.navigation-link-edit-link-label {
 		max-width: 230px;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		white-space: nowrap;
+	}
+
+	.navigation-link-edit-link-rich-text {
+		max-width: 600px;
 	}
 }
 

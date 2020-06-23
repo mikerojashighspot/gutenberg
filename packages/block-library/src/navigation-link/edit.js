@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escape, get, head, find } from 'lodash';
+import { get, head, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,34 +12,27 @@ import { createBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import {
 	ExternalLink,
-	KeyboardShortcuts,
 	PanelBody,
-	Popover,
 	TextareaControl,
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
 	InspectorControls,
 	RichText,
-	__experimentalLinkControl as LinkControl,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP } from '@wordpress/url';
-import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
-import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { link as linkIcon } from '@wordpress/icons';
+import { Fragment, useCallback, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
-import useDisplayUrl from './use-display-url';
+import ToolbarUrlButton from './toolbar-url-button';
 
 function NavigationLinkEdit( {
 	attributes,
@@ -61,105 +54,20 @@ function NavigationLinkEdit( {
 	mergeBlocks,
 	onReplace,
 } ) {
-	const { label, opensInNewTab, url, nofollow, description } = attributes;
-	const link = {
-		url,
-		opensInNewTab,
-	};
-	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	const { label, url, opensInNewTab, nofollow, description } = attributes;
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
-	// Show the LinkControl on mount if the URL is empty
-	// ( When adding a new menu item)
-	// This can't be done in the useState call because it cconflicts
-	// with the autofocus behavior of the BlockListBlock component.
-	useEffect( () => {
-		if ( ! url ) {
-			setIsLinkOpen( true );
-		}
-	}, [] );
-
-	/**
-	 * The hook shouldn't be necessary but due to a focus loss happening
-	 * when selecting a suggestion in the link popover, we force close on block unselection.
-	 */
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsLinkOpen( false );
-		}
-	}, [ isSelected ] );
-
-	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
-	useEffect( () => {
-		if ( isLinkOpen && url ) {
-			// Does this look like a URL and have something TLD-ish?
-			if (
-				isURL( prependHTTP( label ) ) &&
-				/^.+\.[a-z]+/.test( label )
-			) {
-				// Focus and select the label text.
-				selectLabelText();
-			} else {
-				// Focus it (but do not select).
-				placeCaretAtHorizontalEdge( ref.current, true );
-			}
-		}
-	}, [ url ] );
-
-	const displayUrl = useDisplayUrl( attributes.url );
-
-	/**
-	 * Focus the Link label text and select it.
-	 */
-	function selectLabelText() {
-		ref.current.focus();
-		const selection = window.getSelection();
-		const range = document.createRange();
-		// Get the range of the current ref contents so we can add this range to the selection.
-		range.selectNodeContents( ref.current );
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
-
-	async function handleCreatePage( pageTitle ) {
-		const type = 'page';
-		const page = await saveEntityRecord( 'postType', type, {
-			title: pageTitle,
-			status: 'publish',
-		} );
-
-		return {
-			id: page.id,
-			type,
-			title: page.title.rendered,
-			url: page.link,
-		};
-	}
-
 	return (
 		<Fragment>
-			<BlockControls>
+			<BlockControls key="1">
+				<ToolbarUrlButton
+					key="toolbar-url"
+					url={ url }
+					onChange={ ( newUrl ) => setAttributes( { url: newUrl } ) }
+				/>
+				<ToolbarGroup eventToOffset={ () => undefined }></ToolbarGroup>
 				<ToolbarGroup>
-					<KeyboardShortcuts
-						bindGlobal
-						shortcuts={ {
-							[ rawShortcut.primary( 'k' ) ]: () =>
-								setIsLinkOpen( true ),
-						} }
-					/>
-					<ToolbarButton
-						name="link"
-						icon={ displayUrl ? null : linkIcon }
-						title={ __( 'Link' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ () => setIsLinkOpen( true ) }
-						className="navigation-link-edit-link-button"
-					>
-						<span className="navigation-link-edit-link-label">
-							{ displayUrl }
-						</span>
-					</ToolbarButton>
 					<ToolbarButton
 						name="submenu"
 						icon={ <ToolbarSubmenuIcon /> }
@@ -248,57 +156,6 @@ function NavigationLinkEdit( {
 							'core/strikethrough',
 						] }
 					/>
-					{ isLinkOpen && (
-						<Popover
-							position="bottom center"
-							onClose={ () => setIsLinkOpen( false ) }
-						>
-							<LinkControl
-								className="wp-block-navigation-link__inline-link-input"
-								value={ link }
-								showInitialSuggestions={ true }
-								createSuggestion={
-									userCanCreatePages
-										? handleCreatePage
-										: undefined
-								}
-								onChange={ ( {
-									title: newTitle = '',
-									url: newURL = '',
-									opensInNewTab: newOpensInNewTab,
-									id,
-								} = {} ) =>
-									setAttributes( {
-										url: encodeURI( newURL ),
-										label: ( () => {
-											const normalizedTitle = newTitle.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											const normalizedURL = newURL.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											if (
-												newTitle !== '' &&
-												normalizedTitle !==
-													normalizedURL &&
-												label !== newTitle
-											) {
-												return escape( newTitle );
-											} else if ( label ) {
-												return label;
-											}
-											// If there's no label, add the URL.
-											return escape( normalizedURL );
-										} )(),
-										opensInNewTab: newOpensInNewTab,
-										id,
-									} )
-								}
-							/>
-						</Popover>
-					) }
 				</div>
 				{ showSubmenuIcon && (
 					<span className="wp-block-navigation-link__submenu-icon">
