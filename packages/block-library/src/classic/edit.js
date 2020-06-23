@@ -3,7 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
 
 const { wp } = window;
 
@@ -113,6 +113,11 @@ export default class ClassicEdit extends Component {
 		} );
 
 		editor.on( 'keydown', ( event ) => {
+			 // Prevent Gutenberg undo from kicking in so TinyMCE undo stack works.
+			if ( isKeyboardEvent.primary( event, 'z' ) ) {
+				event.stopPropagation();
+			}
+
 			if (
 				( event.keyCode === BACKSPACE || event.keyCode === DELETE ) &&
 				isTmceEmpty( editor )
