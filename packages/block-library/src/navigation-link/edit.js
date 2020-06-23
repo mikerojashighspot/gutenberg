@@ -39,6 +39,7 @@ import { link as linkIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
+import useDisplayUrl from './use-display-url';
 
 function NavigationLinkEdit( {
 	attributes,
@@ -106,6 +107,8 @@ function NavigationLinkEdit( {
 		}
 	}, [ url ] );
 
+	const displayUrl = useDisplayUrl( attributes.url );
+
 	/**
 	 * Focus the Link label text and select it.
 	 */
@@ -147,11 +150,16 @@ function NavigationLinkEdit( {
 					/>
 					<ToolbarButton
 						name="link"
-						icon={ linkIcon }
+						icon={ displayUrl ? null : linkIcon }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ () => setIsLinkOpen( true ) }
-					/>
+						className="navigation-link-edit-link-button"
+					>
+						<span className="navigation-link-edit-link-label">
+							{ displayUrl }
+						</span>
+					</ToolbarButton>
 					<ToolbarButton
 						name="submenu"
 						icon={ <ToolbarSubmenuIcon /> }
