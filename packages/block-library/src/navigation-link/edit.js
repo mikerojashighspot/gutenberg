@@ -172,19 +172,15 @@ function NavigationLinkEdit( {
 										onChange={ ( e ) => {
 											setEditUrl( e.currentTarget.value );
 										} }
-										onBlur={ () => {
-											// handleFinishEditing();
-										} }
 										onKeyDown={ ( e ) => {
 											if ( e.which === 13 ) {
-												handleFinishEditing();
+												finishLinkEditing( true );
+											}
+											if ( e.which === 27 ) {
+												finishLinkEditing( false );
 											}
 										} }
-										onKeyUp={ ( e ) => {
-											if ( e.which === 13 ) {
-												handleFinishEditing();
-											}
-										} }
+										onKeyUp={ ( e ) => {} }
 									/>
 									<Popover position="bottom center">
 										<div ref={ popoverRef }>
