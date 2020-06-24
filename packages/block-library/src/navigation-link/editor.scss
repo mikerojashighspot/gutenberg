@@ -12,7 +12,6 @@
 	.navigation-link-edit__toolbar-link-pane {
 		& {
 			position: absolute;
-			//height: 44px;
 			top: 0;
 			left: 0;
 			right: -1px;
@@ -21,12 +20,6 @@
 			overflow: hidden;
 			background: #FFF;
 		}
-		//display: block;
-
-		//display: flex;
-		//padding: 0 $grid-unit-10;
-		//align-items: center;
-		//justify-content: center;
 	}
 
 	.navigation-link-edit__toolbar-link-input-group {
