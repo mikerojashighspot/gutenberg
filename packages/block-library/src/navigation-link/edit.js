@@ -180,28 +180,32 @@ function NavigationLinkEdit( {
 
 				{ isLinkOpen && (
 					// @TODO: This removes the accessible-toolbar class
-					<div className="block-editor-block-toolbar__slot navigation-link-edit-link-input-pane">
+					<div className="block-editor-block-toolbar__slot navigation-link-edit__toolbar-link-pane">
 						{ /* @TODO use URLInput? */ }
-						<ToolbarGroup>
-							<input
-								ref={ inputRef }
-								type="text"
-								placeholder={ 'Link address' }
-								className="navigation-link-edit-link-input"
-								value={ editUrl }
-								onChange={ ( e ) => {
-									setEditUrl( e.currentTarget.value );
-								} }
-								onKeyDown={ ( e ) => {
-									if ( e.which === 13 ) {
-										finishLinkEditing( true );
-									}
-									if ( e.which === 27 ) {
-										finishLinkEditing( false );
-									}
-								} }
-								onKeyUp={ ( e ) => {} }
-							/>
+						<ToolbarGroup className="navigation-link-edit__toolbar-link-input-group">
+							<ToolbarItem ref={ inputRef }>
+								{ ( toolbarItemProps ) => (
+									<input
+										{ ...toolbarItemProps }
+										type="text"
+										placeholder={ 'Link address' }
+										className="navigation-link-edit__toolbar-link-input"
+										value={ editUrl }
+										onChange={ ( e ) => {
+											setEditUrl( e.currentTarget.value );
+										} }
+										onKeyDown={ ( e ) => {
+											if ( e.which === 13 ) {
+												finishLinkEditing( true );
+											}
+											if ( e.which === 27 ) {
+												finishLinkEditing( false );
+											}
+										} }
+										onKeyUp={ ( e ) => {} }
+									/>
+								) }
+							</ToolbarItem>
 							<ToolbarButton
 								name="new-window"
 								icon={ externalIcon }

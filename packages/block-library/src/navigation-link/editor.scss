@@ -9,15 +9,13 @@
 
 // Truncate long URLs in the toolbar
 .block-editor-block-toolbar {
-	.navigation-link-edit-link-input-pane {
+	.navigation-link-edit__toolbar-link-pane {
 		& {
 			position: absolute;
-			width: 100%;
-			max-width: 500px;
-			height: 44px;
+			//height: 44px;
 			top: 0;
 			left: 0;
-			right: 0;
+			right: -1px;
 			bottom: 0;
 			z-index: 100;
 			background: #FFF;
@@ -30,9 +28,15 @@
 		//justify-content: center;
 	}
 
-	.navigation-link-edit-link-input {
+	.navigation-link-edit__toolbar-link-input-group {
+		flex-grow: 1;
+	}
+
+	.navigation-link-edit__toolbar-link-input {
 		height: 90%;
 		border: 1px solid #ccc;
+		flex-grow: 1;
+		align-self: center;
 		font-size: 13px;
 	}
 
