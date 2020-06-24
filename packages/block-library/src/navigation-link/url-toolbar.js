@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { useTransition, animated } from 'react-spring/web.cjs';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -83,58 +88,68 @@ export default function URLToolbar( { url, isOpen, setOpen, setAttributes } ) {
 		};
 	}, [ isOpen ] );
 
-	if ( ! isOpen ) {
-		return null;
-	}
+	const transitions = useTransition( isOpen, null, {
+		from: { position: 'absolute', opacity: 0, left: '50%' },
+		enter: { opacity: 1, left: '0%', right: '0%' },
+		leave: { opacity: 0, left: '50%', right: '50%' },
+	} );
 
-	return (
-		<div className="block-editor-block-toolbar__slot navigation-link-edit__toolbar-link-pane" ref={ref}>
-			{ /* @TODO use URLInput? */ }
-			<ToolbarGroup className="navigation-link-edit__toolbar-link-input-group">
-				<ToolbarItem ref={ inputRef }>
-					{ ( toolbarItemProps ) => (
-						<input
-							{ ...toolbarItemProps }
-							type="text"
-							placeholder={ 'Link address' }
-							className="navigation-link-edit__toolbar-link-input"
-							value={ editUrl }
-							onChange={ ( e ) => {
-								setEditUrl( e.currentTarget.value );
-							} }
-							onKeyDown={ ( e ) => {
-								if ( e.which === 13 ) {
-									finishLinkEditing( true );
-								}
-								if ( e.which === 27 ) {
-									finishLinkEditing( false );
-								}
-							} }
-							onKeyUp={ ( e ) => {} }
-						/>
-					) }
-				</ToolbarItem>
-				<ToolbarButton
-					name="new-window"
-					icon={ externalIcon }
-					title={ __( 'Open in new window' ) }
-					onClick={ () => {
-						const win = window.open( editUrl, '_blank' );
-						win.focus();
-					} }
-				/>
-			</ToolbarGroup>
-			<ToolbarGroup>
-				<ToolbarButton
-					name="done"
-					title={ __( 'Done' ) }
-					onClick={ () => finishLinkEditing( true ) }
-					className="navigation-link-edit-link-done"
+	return transitions.map(
+		( { item, key, props } ) =>
+			item && (
+				<animated.div
+					key={ key }
+					style={ props }
+					ref={ ref }
+					className="block-editor-block-toolbar__slot navigation-link-edit__toolbar-link-pane"
 				>
-					Done
-				</ToolbarButton>
-			</ToolbarGroup>
-		</div>
+					{ /* @TODO use URLInput? */ }
+					<ToolbarGroup className="navigation-link-edit__toolbar-link-input-group">
+						<ToolbarItem ref={ inputRef }>
+							{ ( toolbarItemProps ) => (
+								<input
+									{ ...toolbarItemProps }
+									type="text"
+									placeholder={ 'Link address' }
+									className="navigation-link-edit__toolbar-link-input"
+									value={ editUrl }
+									onChange={ ( e ) => {
+										setEditUrl( e.currentTarget.value );
+									} }
+									onKeyDown={ ( e ) => {
+										if ( e.which === 13 ) {
+											finishLinkEditing( true );
+										}
+										if ( e.which === 27 ) {
+											finishLinkEditing( false );
+										}
+									} }
+									onKeyUp={ ( e ) => {} }
+								/>
+							) }
+						</ToolbarItem>
+						<ToolbarButton
+							name="new-window"
+							icon={ externalIcon }
+							title={ __( 'Open in new window' ) }
+							onClick={ () => {
+								const win = window.open( editUrl, '_blank' );
+								win.focus();
+							} }
+						/>
+					</ToolbarGroup>
+					<ToolbarGroup>
+						<ToolbarButton
+							name="done"
+							title={ __( 'Done' ) }
+							onClick={ () => finishLinkEditing( true ) }
+							className="navigation-link-edit-link-done"
+						>
+							Done
+						</ToolbarButton>
+					</ToolbarGroup>
+				</animated.div>
+			)
 	);
 }
 
