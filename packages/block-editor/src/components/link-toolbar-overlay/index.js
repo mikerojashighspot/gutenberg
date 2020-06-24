@@ -38,14 +38,12 @@ export default function LinkToolbarOverlay( {
 	useEffect( () => {
 		if ( isOpen ) {
 			setEditUrl( displayUrl );
-			// @TODO: This function steals focus from the popover.
-			//        Let's make sure the popover isn't getting focused in the first place
 			// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
 			setTimeout( () => {
 				if ( inputRef.current ) {
 					inputRef.current.focus();
 				}
-			}, 100 );
+			} );
 		}
 	}, [ isOpen ] );
 
