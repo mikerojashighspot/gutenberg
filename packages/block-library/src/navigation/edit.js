@@ -215,7 +215,7 @@ function Navigation( {
 									: false
 							}
 							templateInsertUpdatesSelection={ false }
-							__experimentalMoverDirection={
+							__experimentalBlockListOrientation={
 								attributes.orientation || 'horizontal'
 							}
 							__experimentalTagName="ul"
