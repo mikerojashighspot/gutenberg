@@ -425,6 +425,7 @@ class URLInput extends Component {
 				id={ id }
 				className={ classnames( 'block-editor-url-input', className, {
 					'is-full-width': isFullWidth,
+					'is-only-suggestions': onlySuggestions,
 				} ) }
 			>
 				{ ! onlySuggestions && (

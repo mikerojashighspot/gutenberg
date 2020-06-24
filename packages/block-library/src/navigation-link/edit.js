@@ -88,10 +88,32 @@ function NavigationLinkEdit( {
 	}, [] );
 
 	useEffect( () => {
-		console.log( 'isLinkOpen', isLinkOpen );
+		if ( ! isLinkOpen ) {
+			return;
+		}
+
+		const listener = function ( e ) {
+			const input = inputPaneRef.current;
+			const popover = popoverRef.current;
+			if (
+				input !== e.target &&
+				! input?.contains( e.target ) &&
+				popover !== e.target &&
+				! popover?.contains( e.target )
+			) {
+				setIsLinkOpen( false );
+			}
+		};
+		document.addEventListener( 'click', listener, false );
+
+		return function () {
+			document.removeEventListener( 'click', listener );
+		};
 	}, [ isLinkOpen ] );
 
 	const inputRef = useRef();
+	const inputPaneRef = useRef();
+	const popoverRef = useRef();
 	const setIsLinkOpen = ( value ) => {
 		setEditUrl( displayUrl );
 		_setIsLinkOpen( value );
@@ -135,11 +157,14 @@ function NavigationLinkEdit( {
 					{ isLinkOpen ? (
 						<ToolbarItem ref={ inputRef }>
 							{ ( toolbarItemProps ) => (
-								<div>
+								<div
+									className="navigation-link-edit-link-input-pane"
+									ref={ inputPaneRef }
+								>
 									<input
 										type="text"
 										placeholder={ 'Link address' }
-										className="navigation-link-edit-link-rich-text"
+										className="navigation-link-edit-link-input"
 										value={ editUrl }
 										{ ...toolbarItemProps }
 										onChange={ ( e ) => {
@@ -160,54 +185,62 @@ function NavigationLinkEdit( {
 										} }
 									/>
 									<Popover position="bottom center">
-										<LinkControl
-											className="wp-block-navigation-link__inline-link-input"
-											value={ editUrl }
-											showInitialSuggestions={ true }
-											createSuggestion={
-												userCanCreatePages
-													? handleCreatePage
-													: undefined
-											}
-											inputValue={ editUrl }
-											onlySuggestions
-											onChange={ ( {
-												title: newTitle = '',
-												url: newURL = '',
-												opensInNewTab: newOpensInNewTab,
-												id,
-											} = {} ) => {
-												console.log( 'ON CHANGE' );
-												setIsLinkOpen( false );
-												setAttributes( {
-													url: encodeURI( newURL ),
-													label: ( () => {
-														const normalizedTitle = newTitle.replace(
-															/http(s?):\/\//gi,
-															''
-														);
-														const normalizedURL = newURL.replace(
-															/http(s?):\/\//gi,
-															''
-														);
-														if (
-															newTitle !== '' &&
-															normalizedTitle !==
-																normalizedURL &&
-															label !== newTitle
-														) {
-															return newTitle;
-														} else if ( label ) {
-															return label;
-														}
-														// If there's no label, add the URL.
-														return normalizedURL;
-													} )(),
+										<div ref={ popoverRef }>
+											<LinkControl
+												className="wp-block-navigation-link__inline-link-input"
+												value={ editUrl }
+												showInitialSuggestions={ true }
+												createSuggestion={
+													userCanCreatePages
+														? handleCreatePage
+														: undefined
+												}
+												inputValue={ editUrl }
+												onlySuggestions
+												onChange={ ( {
+													title: newTitle = '',
+													url: newURL = '',
 													opensInNewTab: newOpensInNewTab,
 													id,
-												} );
-											} }
-										/>
+												} = {} ) => {
+													console.log( 'ON CHANGE' );
+													setIsLinkOpen( false );
+													setAttributes( {
+														url: encodeURI(
+															newURL
+														),
+														label: ( () => {
+															const normalizedTitle = newTitle.replace(
+																/http(s?):\/\//gi,
+																''
+															);
+															const normalizedURL = newURL.replace(
+																/http(s?):\/\//gi,
+																''
+															);
+															if (
+																newTitle !==
+																	'' &&
+																normalizedTitle !==
+																	normalizedURL &&
+																label !==
+																	newTitle
+															) {
+																return newTitle;
+															} else if (
+																label
+															) {
+																return label;
+															}
+															// If there's no label, add the URL.
+															return normalizedURL;
+														} )(),
+														opensInNewTab: newOpensInNewTab,
+														id,
+													} );
+												} }
+											/>
+										</div>
 									</Popover>
 								</div>
 							) }

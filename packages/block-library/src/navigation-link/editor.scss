@@ -8,27 +8,40 @@
 }
 
 // Truncate long URLs in the toolbar
-.block-editor-block-toolbar .navigation-link-edit-link-button {
-	&,
-	&.components-button.components-button.has-icon svg {
-		margin-right: 0;
+.block-editor-block-toolbar {
+	.navigation-link-edit-link-input-pane {
+		display: flex;
+		padding: 0 $grid-unit-10;
+		align-items: center;
+		justify-content: center;
 	}
 
-	.navigation-link-edit-link-label,
-	.navigation-link-edit-link-rich-text {
-		display: inline-block;
-		white-space: nowrap !important;
-		transition: max-width 0.3s ease-in;
+	.navigation-link-edit-link-input {
+		border: 1px solid #ccc;
 	}
 
-	.navigation-link-edit-link-label {
-		max-width: 230px;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
+	.navigation-link-edit-link-button {
+		&,
+		&.components-button.components-button.has-icon svg {
+			margin-right: 0;
+		}
 
-	.navigation-link-edit-link-rich-text {
-		max-width: 600px;
+		.navigation-link-edit-link-label,
+		.navigation-link-edit-link-rich-text {
+			display: inline-block;
+			white-space: nowrap !important;
+			transition: max-width 0.3s ease-in;
+		}
+
+		.navigation-link-edit-link-label {
+			max-width: 230px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.navigation-link-edit-link-rich-text {
+			max-width: 600px;
+		}
 	}
 }
 
