@@ -115,7 +115,6 @@ function NavigationLinkEdit( {
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
-								showInitialSuggestions={ true }
 								createSuggestion={
 									userCanCreatePages
 										? handleCreatePage
@@ -123,6 +122,8 @@ function NavigationLinkEdit( {
 								}
 								inputValue={ url }
 								onlySuggestions
+								showInitialSuggestions
+								forceIsEditingLink
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
