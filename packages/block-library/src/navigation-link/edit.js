@@ -72,7 +72,31 @@ function NavigationLinkEdit( {
 
 	const displayUrl = useDisplayUrl( url );
 	const [ editUrl, setEditUrl ] = useState( displayUrl );
-	const [ isLinkOpen, _setIsLinkOpen ] = useState( false );
+	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+
+	const inputRef = useRef();
+	const inputPaneRef = useRef();
+	const popoverRef = useRef();
+
+	const startLinkEditing = () => {
+		setEditUrl( displayUrl );
+		setIsLinkOpen( true );
+		// @TODO: This function is stealing focus from the popover.
+		//        Let's make sure the popover isn't getting focused in the first place
+		setTimeout( () => {
+			if ( inputRef.current ) {
+				inputRef.current.focus();
+			}
+		}, 100 );
+	};
+
+	const finishLinkEditing = ( acceptChanges = true ) => {
+		if ( acceptChanges ) {
+			setAttributes( { url: editUrl } );
+		}
+		setIsLinkOpen( false );
+	};
+
 	// const link = {
 	// 	url,
 	// 	opensInNewTab,
@@ -83,7 +107,7 @@ function NavigationLinkEdit( {
 	// with the autofocus behavior of the BlockListBlock component.
 	useEffect( () => {
 		if ( ! url ) {
-			// setIsLinkOpen( true );
+			// startLinkEditing( true );
 		}
 	}, [] );
 
@@ -101,7 +125,7 @@ function NavigationLinkEdit( {
 				popover !== e.target &&
 				! popover?.contains( e.target )
 			) {
-				setIsLinkOpen( false );
+				finishLinkEditing( false );
 			}
 		};
 		document.addEventListener( 'click', listener, false );
@@ -112,30 +136,6 @@ function NavigationLinkEdit( {
 			document.removeEventListener( 'focus', listener );
 		};
 	}, [ isLinkOpen ] );
-
-	const inputRef = useRef();
-	const inputPaneRef = useRef();
-	const popoverRef = useRef();
-	const setIsLinkOpen = ( value ) => {
-		setEditUrl( displayUrl );
-		_setIsLinkOpen( value );
-		// @TODO: This function is stealing focus from the popover.
-		//        Let's make sure the popover isn't getting focused in the first place
-		setTimeout( () => {
-			console.log( inputRef.current );
-			if ( inputRef.current ) {
-				inputRef.current.focus();
-			}
-		}, 100 );
-	};
-
-	const handleFinishEditing = useCallback( () => {
-		setAttributes( { url: editUrl } );
-		setIsLinkOpen( false );
-		if ( inputRef.current ) {
-			inputRef.current.blur();
-		}
-	}, [ editUrl ] );
 
 	async function handleCreatePage( pageTitle ) {
 		const type = 'page';
@@ -206,7 +206,7 @@ function NavigationLinkEdit( {
 													id,
 												} = {} ) => {
 													console.log( 'ON CHANGE' );
-													setIsLinkOpen( false );
+													finishLinkEditing( true );
 													setAttributes( {
 														url: encodeURI(
 															newURL
@@ -253,7 +253,7 @@ function NavigationLinkEdit( {
 								bindGlobal
 								shortcuts={ {
 									[ rawShortcut.primary( 'k' ) ]: () =>
-										setIsLinkOpen( true ),
+										startLinkEditing(),
 								} }
 							/>
 							<ToolbarButton
@@ -261,7 +261,7 @@ function NavigationLinkEdit( {
 								icon={ displayUrl ? null : linkIcon }
 								title={ __( 'Link' ) }
 								shortcut={ displayShortcut.primary( 'k' ) }
-								onClick={ () => setIsLinkOpen( true ) }
+								onClick={ () => startLinkEditing() }
 								className="navigation-link-edit-link-button"
 							>
 								<span className="navigation-link-edit-link-label">
