@@ -112,55 +112,57 @@ function NavigationLinkEdit( {
 					setOpen={ setIsLinkOpen }
 					setAttributes={ setAttributes }
 					popoverFactory={ ( { popoverRef } ) => (
-						<Popover position="bottom center" ref={ popoverRef }>
-							<LinkControl
-								className="wp-block-navigation-link__inline-link-input"
-								value={ link }
-								createSuggestion={
-									userCanCreatePages
-										? handleCreatePage
-										: undefined
-								}
-								inputValue={ url }
-								onlySuggestions
-								showInitialSuggestions
-								forceIsEditingLink
-								onChange={ ( {
-									title: newTitle = '',
-									url: newURL = '',
-									id,
-								} = {} ) => {
-									if ( newURL && newURL !== url ) {
-										setIsLinkOpen( false );
+						<Popover position="bottom center">
+							<div ref={ popoverRef }>
+								<LinkControl
+									className="wp-block-navigation-link__inline-link-input"
+									value={ link }
+									createSuggestion={
+										userCanCreatePages
+											? handleCreatePage
+											: undefined
 									}
-									setAttributes( {
-										url: encodeURI( newURL ),
-										label: ( () => {
-											const normalizedTitle = newTitle.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											const normalizedURL = newURL.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											if (
-												newTitle !== '' &&
-												normalizedTitle !==
-													normalizedURL &&
-												label !== newTitle
-											) {
-												return newTitle;
-											} else if ( label ) {
-												return label;
-											}
-											// If there's no label, add the URL.
-											return normalizedURL;
-										} )(),
+									inputValue={ url }
+									onlySuggestions
+									showInitialSuggestions
+									forceIsEditingLink
+									onChange={ ( {
+										title: newTitle = '',
+										url: newURL = '',
 										id,
-									} );
-								} }
-							/>
+									} = {} ) => {
+										if ( newURL && newURL !== url ) {
+											setIsLinkOpen( false );
+										}
+										setAttributes( {
+											url: encodeURI( newURL ),
+											label: ( () => {
+												const normalizedTitle = newTitle.replace(
+													/http(s?):\/\//gi,
+													''
+												);
+												const normalizedURL = newURL.replace(
+													/http(s?):\/\//gi,
+													''
+												);
+												if (
+													newTitle !== '' &&
+													normalizedTitle !==
+														normalizedURL &&
+													label !== newTitle
+												) {
+													return newTitle;
+												} else if ( label ) {
+													return label;
+												}
+												// If there's no label, add the URL.
+												return normalizedURL;
+											} )(),
+											id,
+										} );
+									} }
+								/>
+							</div>
 						</Popover>
 					) }
 				/>

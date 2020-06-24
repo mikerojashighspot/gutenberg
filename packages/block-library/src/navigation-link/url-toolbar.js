@@ -70,7 +70,7 @@ export default function URLToolbar( {
 	}, [] );
 
 	useEffect( () => {
-		if ( 1 || ! isOpen ) {
+		if ( ! isOpen ) {
 			return;
 		}
 
@@ -87,6 +87,7 @@ export default function URLToolbar( {
 				popover !== e.target &&
 				! popover?.contains( e.target )
 			) {
+				console.log( e.target, popover );
 				finishLinkEditing( false );
 			}
 		};
