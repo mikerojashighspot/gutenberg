@@ -68,23 +68,27 @@ export default function URLToolbar( { url, isOpen, setOpen, setAttributes } ) {
 		}
 
 		const listener = function ( e ) {
-			const root = ref.current;
+			const urlToolbar = ref.current;
+			const rootToolbar = findParent( urlToolbar, ( node ) =>
+				node.classList.contains( '.block-editor-block-toolbar' )
+			);
+			const toolbar = rootToolbar || urlToolbar;
 			const popover = popoverRef.current;
 			if (
-				root !== e.target &&
-				! root?.contains( e.target ) &&
+				toolbar !== e.target &&
+				! toolbar?.contains( e.target ) &&
 				popover !== e.target &&
 				! popover?.contains( e.target )
 			) {
 				finishLinkEditing( false );
 			}
 		};
-		document.addEventListener( 'mousedown', listener, false );
+		document.addEventListener( 'mousedown', listener );
 		document.addEventListener( 'focus', listener, true );
 
 		return function () {
 			document.removeEventListener( 'mousedown', listener );
-			document.removeEventListener( 'focus', listener );
+			document.removeEventListener( 'focus', listener, true );
 		};
 	}, [ isOpen ] );
 
@@ -153,6 +157,15 @@ export default function URLToolbar( { url, isOpen, setOpen, setAttributes } ) {
 	);
 }
 
+const findParent = ( node, predicate ) => {
+	while ( node && node !== document.body ) {
+		if ( predicate( node ) ) {
+			return node;
+		}
+		node = node.parentNode;
+	}
+	return null;
+};
 /*<Popover position="bottom center">
 	<div ref={ popoverRef }>
 		<LinkControl
