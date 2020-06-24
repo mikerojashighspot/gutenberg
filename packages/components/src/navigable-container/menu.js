@@ -19,8 +19,6 @@ export function NavigableMenu(
 	ref
 ) {
 	const eventToOffset = ( evt ) => {
-		// Prevents keyboard navigation
-		return undefined;
 		const { keyCode } = evt;
 
 		let next = [ DOWN ];
