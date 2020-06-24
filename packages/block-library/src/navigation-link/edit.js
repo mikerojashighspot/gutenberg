@@ -30,7 +30,7 @@ import {
 	__experimentalBlock as Block,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
-import { Fragment, useRef, useState } from '@wordpress/element';
+import { Fragment, useRef, useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -63,6 +63,15 @@ function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	// Show the LinkControl on mount if the URL is empty ( When adding a new menu item)
+	// This can't be done in the useState call because it conflicts
+	// with the autofocus behavior of the BlockListBlock component.
+	useEffect( () => {
+		if ( ! url ) {
+			setIsLinkOpen( true );
+		}
+	}, [] );
+
 	const link = {
 		url,
 		opensInNewTab,

@@ -55,20 +55,6 @@ export default function URLToolbar( {
 		setOpen( false );
 	};
 
-	// const link = {
-	// 	url,
-	// 	opensInNewTab,
-	// };
-	// Show the LinkControl on mount if the URL is empty
-	// ( When adding a new menu item)
-	// This can't be done in the useState call because it cconflicts
-	// with the autofocus behavior of the BlockListBlock component.
-	useEffect( () => {
-		if ( ! url ) {
-			// startLinkEditing( true );
-		}
-	}, [] );
-
 	useEffect( () => {
 		if ( ! isOpen ) {
 			return;
