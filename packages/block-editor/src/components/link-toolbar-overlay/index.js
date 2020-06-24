@@ -20,16 +20,17 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import SuggestionsPopover from './suggestions-popover';
+import useDisplayUrl from '../../hooks/use-display-url';
 
 export default function LinkToolbarOverlay( {
 	url,
-	displayUrl = url,
 	label,
 	opensInNewTab,
 	isOpen,
 	setOpen,
 	onChange,
 } ) {
+	const displayUrl = useDisplayUrl( url );
 	const [ editUrl, setEditUrl ] = useState( displayUrl );
 
 	const inputRef = useRef();

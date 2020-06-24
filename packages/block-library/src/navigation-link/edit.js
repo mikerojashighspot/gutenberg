@@ -28,14 +28,15 @@ import {
 	RichText,
 	LinkToolbarOverlay,
 	__experimentalBlock as Block,
+	useDisplayUrl,
 } from '@wordpress/block-editor';
+
 import { Fragment, useRef, useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
-import useDisplayUrl from './use-display-url';
 
 function NavigationLinkEdit( {
 	attributes,
