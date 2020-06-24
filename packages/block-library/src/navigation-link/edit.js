@@ -128,11 +128,11 @@ function NavigationLinkEdit( {
 				finishLinkEditing( false );
 			}
 		};
-		document.addEventListener( 'click', listener, false );
+		document.addEventListener( 'mousedown', listener, false );
 		document.addEventListener( 'focus', listener, true );
 
 		return function () {
-			document.removeEventListener( 'click', listener );
+			document.removeEventListener( 'mousedown', listener );
 			document.removeEventListener( 'focus', listener );
 		};
 	}, [ isLinkOpen ] );
