@@ -27,6 +27,7 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	RichText,
+	LinkToolbarOverlay,
 	__experimentalBlock as Block,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
@@ -36,7 +37,6 @@ import { Fragment, useRef, useState, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
-import URLToolbar from './url-toolbar';
 
 function NavigationLinkEdit( {
 	attributes,
@@ -114,14 +114,17 @@ function NavigationLinkEdit( {
 						</span>
 					</ToolbarButton>
 				</ToolbarGroup>
-				<URLToolbar
+				<LinkToolbarOverlay
 					url={ url }
 					opensInNewTab={ opensInNewTab }
 					isOpen={ isLinkOpen }
 					setOpen={ setIsLinkOpen }
 					setAttributes={ setAttributes }
 					popoverFactory={ ( { popoverRef } ) => (
-						<Popover position="bottom center">
+						<Popover
+							position="bottom center"
+							focusOnMount={ false }
+						>
 							<div ref={ popoverRef }>
 								<LinkControl
 									className="wp-block-navigation-link__inline-link-input"
