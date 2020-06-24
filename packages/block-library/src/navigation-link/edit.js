@@ -107,6 +107,7 @@ function NavigationLinkEdit( {
 				</ToolbarGroup>
 				<URLToolbar
 					url={ url }
+					opensInNewTab={ opensInNewTab }
 					isOpen={ isLinkOpen }
 					setOpen={ setIsLinkOpen }
 					setAttributes={ setAttributes }
@@ -127,7 +128,6 @@ function NavigationLinkEdit( {
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
-									opensInNewTab: newOpensInNewTab,
 									id,
 								} = {} ) => {
 									if ( newURL && newURL !== url ) {
@@ -157,7 +157,6 @@ function NavigationLinkEdit( {
 											// If there's no label, add the URL.
 											return normalizedURL;
 										} )(),
-										opensInNewTab: newOpensInNewTab,
 										id,
 									} );
 								} }

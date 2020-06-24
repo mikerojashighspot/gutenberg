@@ -22,6 +22,7 @@ import useDisplayUrl from './use-display-url';
 
 export default function URLToolbar( {
 	url,
+	opensInNewTab,
 	isOpen,
 	setOpen,
 	setAttributes,
@@ -144,13 +145,12 @@ export default function URLToolbar( {
 							<ToolbarButton
 								name="new-window"
 								icon={ externalIcon }
-								title={ __( 'Open in new window' ) }
+								title={ __( 'Opens in new window' ) }
+								className={ opensInNewTab ? 'is-active' : '' }
 								onClick={ () => {
-									const win = window.open(
-										editUrl,
-										'_blank'
-									);
-									win.focus();
+									setAttributes( {
+										opensInNewTab: ! opensInNewTab,
+									} );
 								} }
 							/>
 						</ToolbarGroup>
