@@ -22,15 +22,14 @@ const alignmentHooksSetting = {
 
 function ButtonsEdit() {
 	return (
-		<Block.div>
-			<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
-				<InnerBlocks
-					allowedBlocks={ ALLOWED_BLOCKS }
-					template={ BUTTONS_TEMPLATE }
-					__experimentalMoverDirection="horizontal"
-				/>
-			</AlignmentHookSettingsProvider>
-		</Block.div>
+		<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
+			<InnerBlocks
+				allowedBlocks={ ALLOWED_BLOCKS }
+				__experimentalTagName={ Block.div }
+				template={ BUTTONS_TEMPLATE }
+				__experimentalMoverDirection="horizontal"
+			/>
+		</AlignmentHookSettingsProvider>
 	);
 }
 
