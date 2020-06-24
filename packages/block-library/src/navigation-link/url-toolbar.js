@@ -20,7 +20,13 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  */
 import useDisplayUrl from './use-display-url';
 
-export default function URLToolbar( { url, isOpen, setOpen, setAttributes } ) {
+export default function URLToolbar( {
+	url,
+	isOpen,
+	setOpen,
+	setAttributes,
+	popoverFactory,
+} ) {
 	const displayUrl = useDisplayUrl( url );
 	const [ editUrl, setEditUrl ] = useState( displayUrl );
 
@@ -63,7 +69,7 @@ export default function URLToolbar( { url, isOpen, setOpen, setAttributes } ) {
 	}, [] );
 
 	useEffect( () => {
-		if ( ! isOpen ) {
+		if ( 1 || ! isOpen ) {
 			return;
 		}
 
@@ -84,11 +90,11 @@ export default function URLToolbar( { url, isOpen, setOpen, setAttributes } ) {
 			}
 		};
 		document.addEventListener( 'mousedown', listener );
-		document.addEventListener( 'focus', listener, true );
+		// document.addEventListener( 'focus', listener, true );
 
 		return function () {
 			document.removeEventListener( 'mousedown', listener );
-			document.removeEventListener( 'focus', listener, true );
+			// document.removeEventListener( 'focus', listener, true );
 		};
 	}, [ isOpen ] );
 
@@ -99,60 +105,70 @@ export default function URLToolbar( { url, isOpen, setOpen, setAttributes } ) {
 	} );
 
 	return transitions.map(
-		( { item, key, props } ) =>
+		( { item, key, props, state } ) =>
 			item && (
-				<animated.div
+				<div
+					className="block-editor-block-toolbar__slot block-editor-block-toolbar__overlay"
 					key={ key }
-					style={ props }
-					ref={ ref }
-					className="block-editor-block-toolbar__slot navigation-link-edit__toolbar-link-pane"
 				>
-					{ /* @TODO use URLInput? */ }
-					<ToolbarGroup className="navigation-link-edit__toolbar-link-input-group">
-						<ToolbarItem ref={ inputRef }>
-							{ ( toolbarItemProps ) => (
-								<input
-									{ ...toolbarItemProps }
-									type="text"
-									placeholder={ 'Link address' }
-									className="navigation-link-edit__toolbar-link-input"
-									value={ editUrl }
-									onChange={ ( e ) => {
-										setEditUrl( e.currentTarget.value );
-									} }
-									onKeyDown={ ( e ) => {
-										if ( e.which === 13 ) {
-											finishLinkEditing( true );
-										}
-										if ( e.which === 27 ) {
-											finishLinkEditing( false );
-										}
-									} }
-									onKeyUp={ ( e ) => {} }
-								/>
-							) }
-						</ToolbarItem>
-						<ToolbarButton
-							name="new-window"
-							icon={ externalIcon }
-							title={ __( 'Open in new window' ) }
-							onClick={ () => {
-								const win = window.open( editUrl, '_blank' );
-								win.focus();
-							} }
-						/>
-					</ToolbarGroup>
-					<ToolbarGroup>
-						<ToolbarButton
-							name="done"
-							title={ __( 'Done' ) }
-							onClick={ () => finishLinkEditing( true ) }
-							className="navigation-link-edit-link-done"
-						>
-							Done
-						</ToolbarButton>
-					</ToolbarGroup>
-				</animated.div>
+					<animated.div
+						style={ props }
+						ref={ ref }
+						className="block-editor-block-toolbar__overlay-content"
+					>
+						{ /* @TODO use URLInput? */ }
+						<ToolbarGroup className="navigation-link-edit__toolbar-link-input-group">
+							<ToolbarItem ref={ inputRef }>
+								{ ( toolbarItemProps ) => (
+									<input
+										{ ...toolbarItemProps }
+										type="text"
+										placeholder={ 'Link address' }
+										className="navigation-link-edit__toolbar-link-input"
+										value={ editUrl }
+										onChange={ ( e ) => {
+											setEditUrl( e.currentTarget.value );
+										} }
+										onKeyDown={ ( e ) => {
+											if ( e.which === 13 ) {
+												finishLinkEditing( true );
+											}
+											if ( e.which === 27 ) {
+												finishLinkEditing( false );
+											}
+										} }
+										onKeyUp={ ( e ) => {} }
+									/>
+								) }
+							</ToolbarItem>
+							<ToolbarButton
+								name="new-window"
+								icon={ externalIcon }
+								title={ __( 'Open in new window' ) }
+								onClick={ () => {
+									const win = window.open(
+										editUrl,
+										'_blank'
+									);
+									win.focus();
+								} }
+							/>
+						</ToolbarGroup>
+						<ToolbarGroup>
+							<ToolbarButton
+								name="done"
+								title={ __( 'Done' ) }
+								onClick={ () => finishLinkEditing( true ) }
+								className="navigation-link-edit-link-done"
+							>
+								Done
+							</ToolbarButton>
+						</ToolbarGroup>
+					</animated.div>
+					{ state !== 'leave' &&
+						popoverFactory &&
+						popoverFactory( { popoverRef } ) }
+				</div>
 			)
 	);
 }
@@ -166,54 +182,3 @@ const findParent = ( node, predicate ) => {
 	}
 	return null;
 };
-/*<Popover position="bottom center">
-	<div ref={ popoverRef }>
-		<LinkControl
-			className="wp-block-navigation-link__inline-link-input"
-			value={ editUrl }
-			showInitialSuggestions={ true }
-			createSuggestion={
-				userCanCreatePages
-					? handleCreatePage
-					: undefined
-			}
-			inputValue={ editUrl }
-			onlySuggestions
-			onChange={ ( {
-				title: newTitle = '',
-				url: newURL = '',
-				opensInNewTab: newOpensInNewTab,
-				id,
-			} = {} ) => {
-				finishLinkEditing( true );
-				setAttributes( {
-					url: encodeURI( newURL ),
-					label: ( () => {
-						const normalizedTitle = newTitle.replace(
-							/http(s?):\/\//gi,
-							''
-						);
-						const normalizedURL = newURL.replace(
-							/http(s?):\/\//gi,
-							''
-						);
-						if (
-							newTitle !== '' &&
-							normalizedTitle !==
-								normalizedURL &&
-							label !== newTitle
-						) {
-							return newTitle;
-						} else if ( label ) {
-							return label;
-						}
-						// If there's no label, add the URL.
-						return normalizedURL;
-					} )(),
-					opensInNewTab: newOpensInNewTab,
-					id,
-				} );
-			} }
-		/>
-	</div>
-</Popover>*/

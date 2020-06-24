@@ -622,11 +622,13 @@ function LinkControl( {
 					</div>
 				</Fragment>
 			) }
-			<LinkControlSettingsDrawer
-				value={ value }
-				settings={ settings }
-				onChange={ onChange }
-			/>
+			{ ! onlySuggestions && (
+				<LinkControlSettingsDrawer
+					value={ value }
+					settings={ settings }
+					onChange={ onChange }
+				/>
+			) }
 		</div>
 	);
 }

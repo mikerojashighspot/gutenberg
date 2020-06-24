@@ -19,10 +19,8 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
-	__experimentalToolbarItem as ToolbarItem,
 	KeyboardShortcuts,
 } from '@wordpress/components';
-import { link as linkIcon, external as externalIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
@@ -32,13 +30,7 @@ import {
 	__experimentalBlock as Block,
 	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
-import {
-	Fragment,
-	useCallback,
-	useEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { Fragment, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -71,7 +63,10 @@ function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-
+	const link = {
+		url,
+		opensInNewTab,
+	};
 	async function handleCreatePage( pageTitle ) {
 		const type = 'page';
 		const page = await saveEntityRecord( 'postType', type, {
@@ -86,7 +81,6 @@ function NavigationLinkEdit( {
 			url: page.link,
 		};
 	}
-
 	return (
 		<Fragment>
 			<BlockControls key="1">
@@ -116,6 +110,59 @@ function NavigationLinkEdit( {
 					isOpen={ isLinkOpen }
 					setOpen={ setIsLinkOpen }
 					setAttributes={ setAttributes }
+					popoverFactory={ ( { popoverRef } ) => (
+						<Popover position="bottom center" ref={ popoverRef }>
+							<LinkControl
+								className="wp-block-navigation-link__inline-link-input"
+								value={ link }
+								showInitialSuggestions={ true }
+								createSuggestion={
+									userCanCreatePages
+										? handleCreatePage
+										: undefined
+								}
+								inputValue={ url }
+								onlySuggestions
+								onChange={ ( {
+									title: newTitle = '',
+									url: newURL = '',
+									opensInNewTab: newOpensInNewTab,
+									id,
+								} = {} ) => {
+									if ( newURL && newURL !== url ) {
+										setIsLinkOpen( false );
+									}
+									setAttributes( {
+										url: encodeURI( newURL ),
+										label: ( () => {
+											const normalizedTitle = newTitle.replace(
+												/http(s?):\/\//gi,
+												''
+											);
+											const normalizedURL = newURL.replace(
+												/http(s?):\/\//gi,
+												''
+											);
+											if (
+												newTitle !== '' &&
+												normalizedTitle !==
+													normalizedURL &&
+												label !== newTitle
+											) {
+												return newTitle;
+											} else if ( label ) {
+												return label;
+											}
+											// If there's no label, add the URL.
+											return normalizedURL;
+										} )(),
+										opensInNewTab: newOpensInNewTab,
+										id,
+									} );
+								} }
+							/>
+						</Popover>
+					) }
 				/>
 				<ToolbarGroup>
 					<ToolbarButton
