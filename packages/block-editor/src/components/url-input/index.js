@@ -94,6 +94,8 @@ class URLInput extends Component {
 	componentDidMount() {
 		if ( this.shouldShowInitialSuggestions() ) {
 			this.updateSuggestions();
+		} else if ( this.shouldRefreshSuggestions() ) {
+			this.updateSuggestions( this.props.value );
 		}
 	}
 
