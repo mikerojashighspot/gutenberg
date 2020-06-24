@@ -50,9 +50,7 @@ function SuggestionsPopover( { url, close, onSelect, label = '' }, ref ) {
 						url: newURL = '',
 						id,
 					} = {} ) => {
-						if ( newURL && newURL !== url ) {
-							close();
-						}
+						close();
 						onSelect( {
 							url: encodeURI( newURL ),
 							label: ( () => {

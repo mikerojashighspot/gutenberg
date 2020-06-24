@@ -20,7 +20,6 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import SuggestionsPopover from './suggestions-popover';
-//import useDisplayUrl from './use-display-url';
 
 function useDisplayUrl( url ) {
 	return url;

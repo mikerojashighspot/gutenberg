@@ -14,7 +14,6 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import {
 	ExternalLink,
 	PanelBody,
-	Popover,
 	TextareaControl,
 	ToggleControl,
 	ToolbarButton,
@@ -29,7 +28,6 @@ import {
 	RichText,
 	LinkToolbarOverlay,
 	__experimentalBlock as Block,
-	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { Fragment, useRef, useState, useEffect } from '@wordpress/element';
 
@@ -37,6 +35,7 @@ import { Fragment, useRef, useState, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
+import useDisplayUrl from './use-display-url';
 
 function NavigationLinkEdit( {
 	attributes,
@@ -51,14 +50,13 @@ function NavigationLinkEdit( {
 	backgroundColor,
 	rgbTextColor,
 	rgbBackgroundColor,
-	saveEntityRecord,
 	selectedBlockHasDescendants,
-	userCanCreatePages = false,
 	insertBlocksAfter,
 	mergeBlocks,
 	onReplace,
 } ) {
 	const { label, url, opensInNewTab, nofollow, description } = attributes;
+	const displayUrl = useDisplayUrl( url );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
@@ -86,13 +84,13 @@ function NavigationLinkEdit( {
 					<ToolbarButton
 						name="link"
 						icon={ null }
-						title={ url ? url : __( 'Set link' ) }
+						title={ __( 'Edit link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ () => setIsLinkOpen( true ) }
 						className="navigation-link-edit-link-button"
 					>
 						<span className="navigation-link-edit-link-label">
-							{ url ? __( 'Edit link' ) : __( 'Link' ) }
+							{ displayUrl }
 						</span>
 					</ToolbarButton>
 				</ToolbarGroup>
@@ -276,11 +274,6 @@ export default compose( [
 			selectedBlockId,
 		] )?.length;
 
-		const userCanCreatePages = select( 'core' ).canUser(
-			'create',
-			'pages'
-		);
-
 		return {
 			isParentOfSelectedBlock,
 			isImmediateParentOfSelectedBlock,
@@ -289,7 +282,6 @@ export default compose( [
 			showSubmenuIcon,
 			textColor: navigationBlockAttributes.textColor,
 			backgroundColor: navigationBlockAttributes.backgroundColor,
-			userCanCreatePages,
 			rgbTextColor: getColorObjectByColorSlug(
 				colors,
 				navigationBlockAttributes.textColor,
@@ -303,9 +295,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, registry ) => {
-		const { saveEntityRecord } = dispatch( 'core' );
 		return {
-			saveEntityRecord,
 			insertLinkBlock() {
 				const { clientId } = ownProps;
 
