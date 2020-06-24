@@ -72,24 +72,6 @@ function NavigationLinkEdit( {
 		}
 	}, [] );
 
-	const link = {
-		url,
-		opensInNewTab,
-	};
-	async function handleCreatePage( pageTitle ) {
-		const type = 'page';
-		const page = await saveEntityRecord( 'postType', type, {
-			title: pageTitle,
-			status: 'publish',
-		} );
-
-		return {
-			id: page.id,
-			type,
-			title: page.title.rendered,
-			url: page.link,
-		};
-	}
 	return (
 		<Fragment>
 			<BlockControls key="1">
@@ -116,67 +98,12 @@ function NavigationLinkEdit( {
 				</ToolbarGroup>
 				<LinkToolbarOverlay
 					url={ url }
+					label={ label }
 					opensInNewTab={ opensInNewTab }
 					isOpen={ isLinkOpen }
 					setOpen={ setIsLinkOpen }
-					setAttributes={ setAttributes }
-					popoverFactory={ ( { popoverRef } ) => (
-						<Popover
-							position="bottom center"
-							focusOnMount={ false }
-						>
-							<div ref={ popoverRef }>
-								<LinkControl
-									className="wp-block-navigation-link__inline-link-input"
-									value={ link }
-									createSuggestion={
-										userCanCreatePages
-											? handleCreatePage
-											: undefined
-									}
-									inputValue={ url }
-									onlySuggestions
-									showInitialSuggestions
-									forceIsEditingLink
-									onChange={ ( {
-										title: newTitle = '',
-										url: newURL = '',
-										id,
-									} = {} ) => {
-										if ( newURL && newURL !== url ) {
-											setIsLinkOpen( false );
-										}
-										setAttributes( {
-											url: encodeURI( newURL ),
-											label: ( () => {
-												const normalizedTitle = newTitle.replace(
-													/http(s?):\/\//gi,
-													''
-												);
-												const normalizedURL = newURL.replace(
-													/http(s?):\/\//gi,
-													''
-												);
-												if (
-													newTitle !== '' &&
-													normalizedTitle !==
-														normalizedURL &&
-													label !== newTitle
-												) {
-													return newTitle;
-												} else if ( label ) {
-													return label;
-												}
-												// If there's no label, add the URL.
-												return normalizedURL;
-											} )(),
-											id,
-										} );
-									} }
-								/>
-							</div>
-						</Popover>
-					) }
+					onChange={ ( data ) => setAttributes( data ) }
+					withSuggestions
 				/>
 				<ToolbarGroup>
 					<ToolbarButton

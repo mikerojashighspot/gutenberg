@@ -16,6 +16,10 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  *
  * @param url
  */
+/**
+ * Internal dependencies
+ */
+import SuggestionsPopover from './suggestions-popover';
 //import useDisplayUrl from './use-display-url';
 
 function useDisplayUrl( url ) {
@@ -24,11 +28,11 @@ function useDisplayUrl( url ) {
 
 export default function LinkToolbarOverlay( {
 	url,
+	label,
 	opensInNewTab,
 	isOpen,
 	setOpen,
-	setAttributes,
-	popoverFactory,
+	onChange,
 } ) {
 	const displayUrl = useDisplayUrl( url );
 	const [ editUrl, setEditUrl ] = useState( displayUrl );
@@ -51,14 +55,22 @@ export default function LinkToolbarOverlay( {
 
 	const finishLinkEditing = ( acceptChanges = true ) => {
 		if ( acceptChanges ) {
-			setAttributes( { url: editUrl } );
+			onChange( { url: editUrl } );
 		}
 		setOpen( false );
 	};
 
 	return (
 		<ToolbarOverlay
-			popoverFactory={ popoverFactory }
+			popoverFactory={ ( ref ) => (
+				<SuggestionsPopover
+					url={ url }
+					close={ () => setOpen( false ) }
+					onSelect={ ( data ) => onChange( data ) }
+					label={ label }
+					ref={ ref }
+				/>
+			) }
 			close={ () => setOpen( false ) }
 			isOpen={ isOpen }
 		>
@@ -93,7 +105,7 @@ export default function LinkToolbarOverlay( {
 					title={ __( 'Opens in new window' ) }
 					className={ opensInNewTab ? 'is-active' : '' }
 					onClick={ () => {
-						setAttributes( {
+						onChange( {
 							opensInNewTab: ! opensInNewTab,
 						} );
 					} }

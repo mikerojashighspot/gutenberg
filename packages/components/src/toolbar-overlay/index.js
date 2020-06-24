@@ -73,7 +73,7 @@ export default function ToolbarOverlay( {
 					</animated.div>
 					{ state !== 'leave' &&
 						popoverFactory &&
-						popoverFactory( { popoverRef } ) }
+						popoverFactory( popoverRef ) }
 				</div>
 			)
 	);
