@@ -21,19 +21,15 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  */
 import SuggestionsPopover from './suggestions-popover';
 
-function useDisplayUrl( url ) {
-	return url;
-}
-
 export default function LinkToolbarOverlay( {
 	url,
+	displayUrl = url,
 	label,
 	opensInNewTab,
 	isOpen,
 	setOpen,
 	onChange,
 } ) {
-	const displayUrl = useDisplayUrl( url );
 	const [ editUrl, setEditUrl ] = useState( displayUrl );
 
 	const inputRef = useRef();
@@ -64,6 +60,7 @@ export default function LinkToolbarOverlay( {
 			popoverFactory={ ( ref ) => (
 				<SuggestionsPopover
 					url={ url }
+					inputValue={ editUrl }
 					close={ () => setOpen( false ) }
 					onSelect={ ( data ) => onChange( data ) }
 					label={ label }

@@ -10,7 +10,10 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import LinkControl from '../link-control';
 
-function SuggestionsPopover( { url, close, onSelect, label = '' }, ref ) {
+function SuggestionsPopover(
+	{ url, inputValue, close, onSelect, label = '' },
+	ref
+) {
 	const userCanCreatePages = useSelect( ( select ) =>
 		select( 'core' ).canUser( 'create', 'pages' )
 	);
@@ -41,7 +44,7 @@ function SuggestionsPopover( { url, close, onSelect, label = '' }, ref ) {
 					createSuggestion={
 						userCanCreatePages ? handleCreatePage : undefined
 					}
-					inputValue={ url }
+					inputValue={ inputValue }
 					onlySuggestions
 					showInitialSuggestions
 					forceIsEditingLink

@@ -96,6 +96,7 @@ function NavigationLinkEdit( {
 				</ToolbarGroup>
 				<LinkToolbarOverlay
 					url={ url }
+					displayUrl={ displayUrl }
 					label={ label }
 					opensInNewTab={ opensInNewTab }
 					isOpen={ isLinkOpen }
