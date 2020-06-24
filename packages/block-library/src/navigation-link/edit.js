@@ -22,7 +22,7 @@ import {
 	__experimentalToolbarItem as ToolbarItem,
 	KeyboardShortcuts,
 } from '@wordpress/components';
-import { link as linkIcon } from '@wordpress/icons';
+import { link as linkIcon, external as externalIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
@@ -112,6 +112,7 @@ function NavigationLinkEdit( {
 	}, [] );
 
 	useEffect( () => {
+		return;
 		if ( ! isLinkOpen ) {
 			return;
 		}
@@ -156,117 +157,76 @@ function NavigationLinkEdit( {
 		<Fragment>
 			<BlockControls key="1">
 				<ToolbarGroup eventToOffset={ () => undefined }>
-					{ isLinkOpen ? (
-						<ToolbarItem ref={ inputRef }>
-							{ ( toolbarItemProps ) => (
-								<div
-									className="navigation-link-edit-link-input-pane"
-									ref={ inputPaneRef }
-								>
-									{/* @TODO use URLInput? */}
-									<input
-										type="text"
-										placeholder={ 'Link address' }
-										className="navigation-link-edit-link-input"
-										value={ editUrl }
-										{ ...toolbarItemProps }
-										onChange={ ( e ) => {
-											setEditUrl( e.currentTarget.value );
-										} }
-										onKeyDown={ ( e ) => {
-											if ( e.which === 13 ) {
-												finishLinkEditing( true );
-											}
-											if ( e.which === 27 ) {
-												finishLinkEditing( false );
-											}
-										} }
-										onKeyUp={ ( e ) => {} }
-									/>
-									<Popover position="bottom center">
-										<div ref={ popoverRef }>
-											<LinkControl
-												className="wp-block-navigation-link__inline-link-input"
-												value={ editUrl }
-												showInitialSuggestions={ true }
-												createSuggestion={
-													userCanCreatePages
-														? handleCreatePage
-														: undefined
-												}
-												inputValue={ editUrl }
-												onlySuggestions
-												onChange={ ( {
-													title: newTitle = '',
-													url: newURL = '',
-													opensInNewTab: newOpensInNewTab,
-													id,
-												} = {} ) => {
-													finishLinkEditing( true );
-													setAttributes( {
-														url: encodeURI(
-															newURL
-														),
-														label: ( () => {
-															const normalizedTitle = newTitle.replace(
-																/http(s?):\/\//gi,
-																''
-															);
-															const normalizedURL = newURL.replace(
-																/http(s?):\/\//gi,
-																''
-															);
-															if (
-																newTitle !==
-																	'' &&
-																normalizedTitle !==
-																	normalizedURL &&
-																label !==
-																	newTitle
-															) {
-																return newTitle;
-															} else if (
-																label
-															) {
-																return label;
-															}
-															// If there's no label, add the URL.
-															return normalizedURL;
-														} )(),
-														opensInNewTab: newOpensInNewTab,
-														id,
-													} );
-												} }
-											/>
-										</div>
-									</Popover>
-								</div>
-							) }
-						</ToolbarItem>
-					) : (
-						<>
-							<KeyboardShortcuts
-								bindGlobal
-								shortcuts={ {
-									[ rawShortcut.primary( 'k' ) ]: () =>
-										startLinkEditing(),
+					<KeyboardShortcuts
+						bindGlobal
+						shortcuts={ {
+							[ rawShortcut.primary( 'k' ) ]: () =>
+								startLinkEditing(),
+						} }
+					/>
+					<ToolbarButton
+						name="link"
+						icon={ displayUrl ? null : linkIcon }
+						title={ displayUrl ? displayUrl : __( 'Set link' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ () => startLinkEditing() }
+						className="navigation-link-edit-link-button"
+					>
+						<span className="navigation-link-edit-link-label">
+							{ displayUrl ? __( 'Edit link' ) : __( 'Link' ) }
+						</span>
+					</ToolbarButton>
+				</ToolbarGroup>
+
+				{ isLinkOpen && (
+					// @TODO: This removes the accessible-toolbar class
+					<div className="block-editor-block-toolbar__slot navigation-link-edit-link-input-pane">
+						{ /* @TODO use URLInput? */ }
+						<ToolbarGroup>
+							<input
+								ref={ inputRef }
+								type="text"
+								placeholder={ 'Link address' }
+								className="navigation-link-edit-link-input"
+								value={ editUrl }
+								onChange={ ( e ) => {
+									setEditUrl( e.currentTarget.value );
 								} }
+								onKeyDown={ ( e ) => {
+									if ( e.which === 13 ) {
+										finishLinkEditing( true );
+									}
+									if ( e.which === 27 ) {
+										finishLinkEditing( false );
+									}
+								} }
+								onKeyUp={ ( e ) => {} }
 							/>
 							<ToolbarButton
-								name="link"
-								icon={ displayUrl ? null : linkIcon }
-								title={ __( 'Link' ) }
-								shortcut={ displayShortcut.primary( 'k' ) }
-								onClick={ () => startLinkEditing() }
-								className="navigation-link-edit-link-button"
+								name="new-window"
+								icon={ externalIcon }
+								title={ __( 'Open in new window' ) }
+								onClick={ () => {
+									const win = window.open(
+										editUrl,
+										'_blank'
+									);
+									win.focus();
+								} }
+							/>
+						</ToolbarGroup>
+						<ToolbarGroup>
+							<ToolbarButton
+								name="done"
+								title={ __( 'Done' ) }
+								onClick={ () => finishLinkEditing( true ) }
+								className="navigation-link-edit-link-done"
 							>
-								<span className="navigation-link-edit-link-label">
-									{ displayUrl }
-								</span>
+								Done
 							</ToolbarButton>
-						</>
-					) }
-				</ToolbarGroup>
+						</ToolbarGroup>
+					</div>
+				) }
 				<ToolbarGroup>
 					<ToolbarButton
 						name="submenu"
@@ -486,3 +446,55 @@ export default compose( [
 		};
 	} ),
 ] )( NavigationLinkEdit );
+
+/*<Popover position="bottom center">
+	<div ref={ popoverRef }>
+		<LinkControl
+			className="wp-block-navigation-link__inline-link-input"
+			value={ editUrl }
+			showInitialSuggestions={ true }
+			createSuggestion={
+				userCanCreatePages
+					? handleCreatePage
+					: undefined
+			}
+			inputValue={ editUrl }
+			onlySuggestions
+			onChange={ ( {
+				title: newTitle = '',
+				url: newURL = '',
+				opensInNewTab: newOpensInNewTab,
+				id,
+			} = {} ) => {
+				finishLinkEditing( true );
+				setAttributes( {
+					url: encodeURI( newURL ),
+					label: ( () => {
+						const normalizedTitle = newTitle.replace(
+							/http(s?):\/\//gi,
+							''
+						);
+						const normalizedURL = newURL.replace(
+							/http(s?):\/\//gi,
+							''
+						);
+						if (
+							newTitle !== '' &&
+							normalizedTitle !==
+								normalizedURL &&
+							label !== newTitle
+						) {
+							return newTitle;
+						} else if ( label ) {
+							return label;
+						}
+						// If there's no label, add the URL.
+						return normalizedURL;
+					} )(),
+					opensInNewTab: newOpensInNewTab,
+					id,
+				} );
+			} }
+		/>
+	</div>
+</Popover>*/
