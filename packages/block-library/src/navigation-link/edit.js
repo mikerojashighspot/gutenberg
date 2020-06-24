@@ -163,6 +163,7 @@ function NavigationLinkEdit( {
 									className="navigation-link-edit-link-input-pane"
 									ref={ inputPaneRef }
 								>
+									{/* @TODO use URLInput? */}
 									<input
 										type="text"
 										placeholder={ 'Link address' }
@@ -201,7 +202,6 @@ function NavigationLinkEdit( {
 													opensInNewTab: newOpensInNewTab,
 													id,
 												} = {} ) => {
-													console.log( 'ON CHANGE' );
 													finishLinkEditing( true );
 													setAttributes( {
 														url: encodeURI(

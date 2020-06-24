@@ -177,8 +177,6 @@ function LinkControl( {
 		( value && value.url ) || ''
 	);
 	const currentInputValue = propInputValue || internalInputValue;
-	console.log( '---> ', propInputValue, internalInputValue );
-	console.log( '--->>> ', currentInputValue );
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
 			? forceIsEditingLink
